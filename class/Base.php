@@ -33,9 +33,11 @@ class Base
     }
 
     public function call($method, $params = null) {
+        $args_list = func_get_args();
+        array_shift($args_list);
         try {
             $client = new Yar_Client($this->rpc_address);
-            $result = $client->$method($params);
+            $result = $client->$method(...$args_list);
             if ($result['code'] == 'success') {
                 $this->data = $result['data'];
             } else {
