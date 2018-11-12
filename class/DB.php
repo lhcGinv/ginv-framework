@@ -10,7 +10,7 @@ class DB
 
     private $sql;
 
-    public function __construct($connect_name) {
+    private function __construct($connect_name) {
         if ($connect_name == null) {
             $connect_name = config('database.default');
         }
