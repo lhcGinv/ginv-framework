@@ -1,5 +1,5 @@
 <?php
-class SQLLoader
+class sqlLoader
 {
     private $template_dir;
     private $temp_dir;
@@ -16,7 +16,7 @@ class SQLLoader
     }
 
     /**
-     * 读取模板文件生成sqlx函数
+     * 读取模板文件生成sql函数
      * @param $files
      */
     public function load($files)

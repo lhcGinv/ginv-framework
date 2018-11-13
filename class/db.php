@@ -1,6 +1,6 @@
 <?php
 
-class DB
+class db
 {
     //创建静态私有的变量保存该类对象
     static private $instance;
@@ -15,7 +15,7 @@ class DB
             $connect_name = config('database.default');
         }
         $config = config('database.'.$connect_name);
-        self::$pdo = new NewPDO($config);
+        self::$pdo = new customPDO($config);
     }
 
     /**
@@ -27,7 +27,7 @@ class DB
     /**
      * @param null $connect_name
      *
-     * @return DB
+     * @return db
      */
     static public function conn($connect_name = null) {
         if (self::$instance instanceof self) {

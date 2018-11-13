@@ -1,6 +1,6 @@
 <?php
 
-class  Config
+class  config
 {
     private $config_key = [];
 

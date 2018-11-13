@@ -1,6 +1,6 @@
 <?php
 
-class Base
+class base
 {
     // 错误信息，储存code,msg组成的数组
     protected $error = [];

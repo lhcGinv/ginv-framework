@@ -13,7 +13,7 @@ if (! function_exists('config')) {
      */
     function config($key, $default = null)
     {
-        $conf = new Config();
+        $conf = new config();
         // 优先执行设置获取或赋值
         if (is_string($key)) {
             $value = $conf->get($key);
@@ -41,6 +41,6 @@ if (! function_exists('base_path')) {
 if (! function_exists('db')) {
     function db()
     {
-        return DB::conn();
+        return db::conn();
     }
 }

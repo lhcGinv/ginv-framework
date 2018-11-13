@@ -1,5 +1,5 @@
 <?php
-class NewPDO extends \PDO
+class customPDO extends \PDO
 {
 
     public function __construct($config)
