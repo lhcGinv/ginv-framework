@@ -20,7 +20,8 @@
             "class"
         ],
         "files": [
-            "function.php"
+            "function.php",
+            "bootstrap.php"
         ]
     }
 }
