@@ -12,9 +12,9 @@ class customRedis
         $config = config('database.redis');
         $appName = config('app.name');
         try {
-            $redis = new Redis();
-            $redis->connect($config['host'], $config['port'], $config['timeout']);
-            $redis->setOption(Redis::OPT_PREFIX, "{$appName}:");
+            self::$redis_object = new Redis();
+            self::$redis_object->connect($config['host'], $config['port'], $config['timeout']);
+            self::$redis_object->setOption(Redis::OPT_PREFIX, "{$appName}:");
         } catch (RedisException $e) {
             log::error('redis连接失败, msg: ' . $e->getMessage());
             die('redis connection failed');
