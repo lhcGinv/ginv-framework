@@ -22,7 +22,15 @@ class base
 
     }
 
-    public function rpc($server_name, $class_name) {
+    /**
+     * 调用rpc服务
+     *
+     * @param string $server_name
+     * @param string $class_name
+     *
+     * @return $this
+     */
+    public function rpc(string $server_name, string $class_name) {
         $address = config('server.'.$server_name);
         if (strrpos($address, '/') !== strlen($address) -1 ) {
             $address .= '/';
@@ -32,7 +40,14 @@ class base
         return $this;
     }
 
-    public function call($method, $params = null) {
+    /**
+     * 访问rpc的方法
+     * @param string $method
+     * @param mixed   $params
+     *
+     * @return $this
+     */
+    public function call(string $method, $params = null) {
         $args_list = func_get_args();
         array_shift($args_list);
         try {
@@ -57,7 +72,8 @@ class base
     }
 
     /**
-     * @param null $data
+     * 设置当前数据
+     * @param $data
      *
      * @return $this
      */
@@ -67,16 +83,27 @@ class base
         return $this;
     }
 
+    /**
+     * 获取当前数据
+     * @return mixed
+     */
     public function get () {
         return $this->data;
     }
 
-    public function error ($code, $msg = null) {
+    /**
+     * 声明当前的错误
+     * @param string $code
+     * @param string $msg
+     *
+     * @return $this
+     */
+    public function error (string $code, string $msg = '') {
         if ($msg == ''){
-            $msg  = config($code);
+            $msg  = config('error.'.$code);
         }
         $this->code = $code;
-        $this->msg = $msg;
+        $this->msg = empty($msg) ? '' : $msg;
         return $this;
     }
 
@@ -90,6 +117,10 @@ class base
         return $this->code !== 'success';
     }
 
+    /**
+     * 封装响应格式数据
+     * @return array
+     */
     public function response() {
         if ($this->code != 'success') {
             return [

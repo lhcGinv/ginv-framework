@@ -8,7 +8,13 @@ class  config
 
     static $config = [];
 
-    public function get($key){
+    /**
+     * 获取配置
+     * @param string $key
+     *
+     * @return mixed|null
+     */
+    public function get(string $key){
         if ($this->no_config_file) {
             return null;
         }
@@ -27,6 +33,11 @@ class  config
     }
 
 
+    /**
+     * 设置配置
+     * 
+     * @param array $values
+     */
     public function set($values = [])
     {
         foreach ($values as $key => $value) {
@@ -41,11 +52,11 @@ class  config
     /**
      * 加载配置文件 支持格式转换 仅支持一级配置
      *
-     * @param $file_key
+     * @param string $file_key
      *
      * @return $this
      */
-    function loadConfig($file_key){
+    function loadConfig(string $file_key){
         $config_file = "config/{$file_key}.php";
         self::$config[$file_key] = @include_once($config_file);
         if (self::$config[$file_key] == false) {

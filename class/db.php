@@ -11,7 +11,7 @@ class db
     private $sql;
     private $fields = null;
 
-    private function __construct($connect_name) {
+    private function __construct(string $connect_name) {
         if ($connect_name == null) {
             $connect_name = config('database.default');
         }
@@ -46,6 +46,13 @@ class db
         return self::$pdo;
     }
 
+    /**
+     * 重置查询字段
+     * @param $fields
+     * @param $_
+     *
+     * @return $this
+     */
     public function select($fields, $_) {
         $args_list = func_get_args();
         $this->fields = implode(',', $args_list);
@@ -53,7 +60,14 @@ class db
     }
 
 
-    public function query($queryName = '', $params = []) {
+    /**
+     * 查询多条记录
+     * @param string $queryName
+     * @param array  $params
+     *
+     * @return array
+     */
+    public function query(string $queryName, $params = []) {
         $params = $this->sqlDec($queryName, $params);
         $stmt   = $this->prepare();
         if ($stmt === false) {
@@ -68,7 +82,14 @@ class db
         }
     }
 
-    public function queryRow($queryName = '', $params = []) {
+    /**
+     * 查询单条记录
+     * @param string $queryName
+     * @param array  $params
+     *
+     * @return array|mixed
+     */
+    public function queryRow(string $queryName, $params = []) {
         $params = $this->sqlDec($queryName, $params);
         $stmt   = $this->prepare();
         if ($stmt === false) {
@@ -83,7 +104,15 @@ class db
         return $stmt->fetch(self::$pdo::FETCH_ASSOC);
     }
 
-    public function count($queryName = '', $params = []) {
+    /**
+     * count查询快捷返回函数
+     *
+     * @param string $queryName
+     * @param array  $params
+     *
+     * @return int|mixed
+     */
+    public function count(string $queryName, $params = []) {
         $count_result = $this->queryRow($queryName, $params);
         if ($count_result) {
             return current($count_result);
@@ -92,7 +121,14 @@ class db
         }
     }
 
-    public function exec($queryName = '', $params = []) {
+    /**
+     * 执行一条 SQL 语句，并返回受影响的行数
+     * @param string $queryName
+     * @param array  $params
+     *
+     * @return int
+     */
+    public function exec(string $queryName, $params = []) {
         $params = $this->sqlDec($queryName, $params);
         $stmt   = $this->prepare();
         if ($stmt === false) {
@@ -147,6 +183,7 @@ class db
         $this->sql      = preg_replace ( "/\s(?=\s)/","\\1", $this->sql );
         if ($this->fields !== '') {
             $this->sql = str_replace('select *','select '.$this->fields, $this->sql);
+            $this->sql = str_replace('SELECT *','SELECT '.$this->fields, $this->sql);
         }
         $this->fields = '';
         return $prepare_params;
@@ -162,23 +199,25 @@ class db
     }
 
     /**
-     * 开始事务
-     * @return bool
-     */
-    public function begin() {
-        if (self::$pdo->inTransaction() == false) {
-            return self::$pdo->beginTransaction();
-        }
-        return true;
-    }
-
-    /**
      * 判断当前是否在事务中
      * @return bool
      */
     public function isBegin() {
         return self::$pdo->inTransaction();
     }
+
+
+    /**
+     * 启动事务
+     * @return bool
+     */
+    public function begin() {
+        if ($this->isBegin() == false) {
+            return self::$pdo->beginTransaction();
+        }
+        return true;
+    }
+
 
     /**
      * 提交事务

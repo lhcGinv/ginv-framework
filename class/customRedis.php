@@ -56,6 +56,7 @@ class customRedis
     }
 
     /**
+     * 设置redis前缀
      * @param string|null $prefix
      *
      * @return $this
