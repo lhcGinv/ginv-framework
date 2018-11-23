@@ -1,6 +1,6 @@
 <?php
 
-class redis
+class customRedis
 {
     //创建静态私有的变量保存该类对象
     static private $instance;
@@ -11,14 +11,14 @@ class redis
     private function __construct() {
         $config = config('database.redis');
         $appName = config('app.name');
-        //try {
-        $redis = new Redis();
-        $redis->connect($config['host'], $config['port'], $config['timeout']);
-        $redis->setOption(Redis::OPT_PREFIX, "{$appName}:");
-        //        } catch (PDOException $e) {
-        //            log::error('redis连接失败, msg: ' . $e->getMessage());
-        //            die('redis connection failed');
-        //        }
+        try {
+            $redis = new Redis();
+            $redis->connect($config['host'], $config['port'], $config['timeout']);
+            $redis->setOption(Redis::OPT_PREFIX, "{$appName}:");
+        } catch (RedisException $e) {
+            log::error('redis连接失败, msg: ' . $e->getMessage());
+            die('redis connection failed');
+        }
     }
 
     /**
@@ -28,7 +28,7 @@ class redis
     }
 
     /**
-     * @return redis
+     * @return customRedis
      */
     static public function conn() {
         if (self::$instance instanceof self) {
