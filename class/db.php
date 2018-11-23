@@ -31,11 +31,11 @@ class db
     }
 
     /**
-     * @param null $connect_name
+     * @param string $connect_name
      *
      * @return db
      */
-    static public function conn($connect_name = null) {
+    static public function conn($connect_name = '') {
         if (self::$instance instanceof self) {
             return self::$instance;
         }

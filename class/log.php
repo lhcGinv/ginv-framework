@@ -10,7 +10,7 @@ final class log extends SeasLog
     /**
      * 记录debug日志
      *
-     * @param        $message
+     * @param string $message
      * @param array  $content
      * @param string $logger
      *
@@ -24,11 +24,11 @@ final class log extends SeasLog
     /**
      * 记录info日志
      *
-     * @param        $message
+     * @param string $message
      * @param array  $content
      * @param string $logger
      */
-    public static function info($message, $content = [], $logger = '') {
+    public static function info($message, $content = [], $logger = ''){
         self::setPath();
         parent::info($message, $content, $logger);
     }
@@ -36,7 +36,7 @@ final class log extends SeasLog
     /**
      * 记录notice日志
      *
-     * @param        $message
+     * @param string $message
      * @param array  $content
      * @param string $logger
      */
@@ -48,7 +48,7 @@ final class log extends SeasLog
     /**
      * 记录warning日志
      *
-     * @param        $message
+     * @param string $message
      * @param array  $content
      * @param string $logger
      */
@@ -60,7 +60,7 @@ final class log extends SeasLog
     /**
      * 记录error日志
      *
-     * @param        $message
+     * @param string $message
      * @param array  $content
      * @param string $logger
      */
