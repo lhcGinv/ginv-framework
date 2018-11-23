@@ -44,3 +44,33 @@ if (! function_exists('db')) {
         return db::conn();
     }
 }
+
+if (! function_exists('redis')) {
+    function redis() {
+        return $redis = redis::conn();
+    }
+}
+
+
+if (! function_exists('assembleSqlIn')) {
+    function assembleSqlIn($key, $length) {
+        $str = [];
+        for ($i=0;$i<$length;$i++) {
+            $str[] = ':ginv_in_param_'. $key. '_'. $i;
+        }
+        return implode(',', $str);
+    }
+}
+
+if (! function_exists('redis_key')) {
+    function redis_key(string $key, $_) {
+        $args_list = func_get_args();
+        array_shift($args_list);
+        $key = @sprintf($key, $args_list);
+        if ($key == false) {
+            return null;
+        }
+        return $key;
+    }
+}
+

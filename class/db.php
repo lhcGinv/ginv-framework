@@ -9,13 +9,19 @@ class db
     static private $pdo;
 
     private $sql;
+    private $fields = null;
 
     private function __construct($connect_name) {
         if ($connect_name == null) {
             $connect_name = config('database.default');
         }
         $config = config('database.'.$connect_name);
-        self::$pdo = new customPDO($config);
+        try {
+            self::$pdo = new customPDO($config);
+        } catch (PDOException $e) {
+            log::error('数据库连接失败, msg: ' . $e->getMessage());
+            die('Database connection failed');
+        }
     }
 
     /**
@@ -40,21 +46,65 @@ class db
         return self::$pdo;
     }
 
+    public function select($fields, $_) {
+        $args_list = func_get_args();
+        $this->fields = implode(',', $args_list);
+        return $this;
+    }
+
 
     public function query($queryName = '', $params = []) {
         $params = $this->sqlDec($queryName, $params);
-        $pdo    = self::$pdo;
-        $stmt   = $pdo->prepare($this->sql, array($pdo::ATTR_CURSOR => $pdo::CURSOR_FWDONLY));
-        $stmt->execute($params);
-        return $stmt->fetchAll($pdo::FETCH_ASSOC);
+        $stmt   = $this->prepare();
+        if ($stmt === false) {
+            return [];
+        }
+        try {
+            $stmt->execute($params);
+            return $stmt->fetchAll(self::$pdo::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            log::error('sql执行失败, sql: '. $this->sql.', params: '. json_encode($params) .' ,msg: ' . $e->getMessage());
+            return [];
+        }
     }
 
     public function queryRow($queryName = '', $params = []) {
         $params = $this->sqlDec($queryName, $params);
-        $pdo    = self::$pdo;
-        $stmt   = $pdo->prepare($this->sql, array($pdo::ATTR_CURSOR => $pdo::CURSOR_FWDONLY));
-        $stmt->execute($params);
-        return $stmt->fetch($pdo::FETCH_ASSOC);
+        $stmt   = $this->prepare();
+        if ($stmt === false) {
+            return [];
+        }
+        try {
+            $stmt->execute($params);
+        } catch (PDOException $e) {
+            log::error('sql执行失败, sql: '. $this->sql.', params: '. json_encode($params) .' ,msg: ' . $e->getMessage());
+            return [];
+        }
+        return $stmt->fetch(self::$pdo::FETCH_ASSOC);
+    }
+
+    public function count($queryName = '', $params = []) {
+        $count_result = $this->queryRow($queryName, $params);
+        if ($count_result) {
+            return current($count_result);
+        } else {
+            return 0;
+        }
+    }
+
+    public function exec($queryName = '', $params = []) {
+        $params = $this->sqlDec($queryName, $params);
+        $stmt   = $this->prepare();
+        if ($stmt === false) {
+            return 0;
+        }
+        try {
+            $stmt->execute($params);
+        } catch (PDOException $e) {
+            log::error('sql执行失败, sql: '. $this->sql.', params: '. json_encode($params) .' ,msg: ' . $e->getMessage());
+            return 0;
+        }
+        return $stmt->rowCount();
     }
 
     public function getLastID() {
@@ -62,16 +112,43 @@ class db
         return $pdo->lastInsertId();
     }
 
+    public function getSql() {
+        return $this->sql;
+    }
+
+    /**
+     * @return bool|PDOStatement
+     */
+    private function prepare() {
+        try {
+            return self::$pdo->prepare($this->sql, array(self::$pdo::ATTR_CURSOR => self::$pdo::CURSOR_FWDONLY));
+        } catch (PDOException $e) {
+            log::error('sql预执行语句失败, sql: '. $this->sql.', msg: ' . $e->getMessage());
+            return false;
+        }
+    }
+
     private function sqlDec($queryName, $params) {
         $p = [];
         foreach ($params as $k => $v) {
-            if ($v !== 0 && $v !== '' && $v !== null) {
-                $p[':' . $k] = $v;
+            if (!empty($v)) {
+                if (is_array($v)) {
+                    foreach ($v as $in_key => $in_item) {
+                        $p[':ginv_in_param_'. $k . '_' . $in_key] = $in_item;
+                    }
+                } else {
+                    $p[':' . $k] = $v;
+                }
             }
         }
         $prepare_params = $p;
         $queryName      = $this->getFunctionName($queryName);
-        $this->sql      = $queryName($p);
+        $this->sql      = trim($queryName($params));
+        $this->sql      = preg_replace ( "/\s(?=\s)/","\\1", $this->sql );
+        if ($this->fields !== '') {
+            $this->sql = str_replace('select *','select '.$this->fields, $this->sql);
+        }
+        $this->fields = '';
         return $prepare_params;
     }
 
