@@ -66,7 +66,11 @@ if (! function_exists('redis_key')) {
     function redis_key(string $key, $_) {
         $args_list = func_get_args();
         array_shift($args_list);
-        $key = @sprintf($key, $args_list);
+        $redis_key = config('redis_key.'.$key);
+        if ($redis_key == null) {
+            return null;
+        }
+        $key = @sprintf($redis_key, $args_list);
         if ($key == false) {
             return null;
         }
