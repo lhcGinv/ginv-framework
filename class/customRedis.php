@@ -47,7 +47,27 @@ class customRedis
     public function do(string $commend, $params = null){
         $args_list = func_get_args();
         array_shift($args_list);
-        return self::$redis_object->$commend(...$args_list);
+        $result = @self::$redis_object->$commend(...$args_list);
+        $error = error_get_last();
+        if(!empty($error)) {
+            log::warn($error['message'].', params: '. json_encode($args_list));
+        }
+        return $result;
+    }
+
+    /**
+     * @param string|null $prefix
+     *
+     * @return $this
+     */
+    public function prefix(string $prefix=null){
+        if ($prefix === null) {
+            $appName = config('app.name');
+            self::$redis_object->setOption(Redis::OPT_PREFIX, "{$appName}:");
+        } else {
+            self::$redis_object->setOption(Redis::OPT_PREFIX, $prefix);
+        }
+        return $this;
     }
 
 }
