@@ -55,20 +55,4 @@ class customRedis
         return $result;
     }
 
-    /**
-     * 设置redis前缀
-     * @param string|null $prefix
-     *
-     * @return $this
-     */
-    public function prefix(string $prefix=null){
-        if ($prefix === null) {
-            $appName = config('app.name');
-            self::$redis_object->setOption(Redis::OPT_PREFIX, "{$appName}:");
-        } else {
-            self::$redis_object->setOption(Redis::OPT_PREFIX, $prefix);
-        }
-        return $this;
-    }
-
 }
