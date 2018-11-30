@@ -148,7 +148,7 @@ class db
         return $pdo->lastInsertId();
     }
 
-    public function getSql() {
+    public function sql() {
         return $this->sql;
     }
 
