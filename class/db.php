@@ -143,7 +143,7 @@ class db
         return $stmt->rowCount();
     }
 
-    public function getLastID() {
+    public function lastInsertId() {
         $pdo = self::$pdo;
         return $pdo->lastInsertId();
     }
